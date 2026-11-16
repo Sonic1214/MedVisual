@@ -1,0 +1,22 @@
+{
+  "name": "medvisual",
+  "type": "module",
+  "version": "0.2.0",
+  "private": true,
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build && pagefind --site dist",
+    "preview": "astro preview"
+  },
+  "dependencies": {
+    "astro": "7.4.12",
+    "pagefind": "1.6.0",
+    "three": "0.187.0"
+  },
+  "devDependencies": {
+    "@types/three": "0.187.0"
+  },
+  "engines": {
+    "node": ">=22.23.4"
+  }
+}

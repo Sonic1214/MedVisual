@@ -1,0 +1,225 @@
+---
+import { PHASES, SCENARIOS } from './content.js';
+import { simulate } from '../../../lib/heartModel.js';
+import './cardiac.css';
+
+const r = simulate();
+const dur = r.phases.map(([a, b]) => b - a);
+const ms = (s) => `${Math.round(s * 1000) / 1000} s`;
+const m = r.metrics;
+const sliders = [
+  { p: 'hr', name: 'Heart rate', min: 40, max: 180, step: 1, unit: 'bpm', hint: 'Mostly shortens diastole' },
+  { p: 'preload', name: 'Preload (venous filling pressure)', min: 0.4, max: 2.2, step: 0.05, unit: '×', hint: 'More filling, more stretch' },
+  { p: 'afterload', name: 'Afterload (vascular resistance)', min: 0.4, max: 2.2, step: 0.05, unit: '×', hint: 'Harder to eject' },
+  { p: 'contractility', name: 'Contractility', min: 0.3, max: 2.2, step: 0.05, unit: '×', hint: 'Slope of the ESPVR' },
+  { p: 'compliance', name: 'Ventricular stiffness', min: 0.6, max: 2.2, step: 0.05, unit: '×', hint: 'Steepness of the EDPVR' },
+];
+const lesions = [['none', 'No valve lesion'], ['as', 'Aortic stenosis'], ['ar', 'Aortic regurgitation'], ['ms', 'Mitral stenosis'], ['mr', 'Mitral regurgitation']];
+---
+<div class="cc">
+  <nav class="container cc-toc" aria-label="On this page" data-pagefind-ignore>
+    <a href="#lab">3D heart</a><a href="#beat">Phase by phase</a><a href="#pv">PV loop lab</a><a href="#summary">Summary</a>
+  </nav>
+
+  <!-- 1. 3D LAB -->
+  <section id="lab" class="container cc-sec">
+    <div class="lab">
+      <div class="stage" data-stage>
+        <div class="stage-top">
+          <span class="phase-pill"><b data-live="num">1</b><span data-live="phase">Atrial systole</span></span>
+          <span class="valves"><span class="vchip" data-valve="mv">Mitral</span><span class="vchip" data-valve="av">Aortic</span></span>
+        </div>
+        <div class="stage-msg" data-stage-msg>Loading 3D heart…</div>
+        <div class="stage-bottom">
+          <button class="btn icon-btn stage-btn" type="button" data-rotate aria-pressed="false" title="Rotate the heart">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /><path d="M21 4v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            <span class="rot-label">Rotate</span>
+          </button>
+          <span class="stage-hint" data-stage-hint>Drag to turn the heart</span>
+        </div>
+      </div>
+
+      <div class="lab-side">
+        <p class="eyebrow">Live model · left heart</p>
+        <h2>Watch one heart beat</h2>
+        <p class="muted">This heart is driven by a small physiological simulation, so the valves, wall thickness and blood flow follow real pressures and volumes. Slow it down, cut it open, and listen.</p>
+
+        <div class="ctl-row">
+          <button class="btn primary" type="button" data-play aria-pressed="true"><span data-play-label>Pause</span></button>
+          <div class="seg" role="group" aria-label="Speed">
+            <button type="button" data-speed="1" aria-pressed="true">1×</button><button type="button" data-speed="0.4">0.4×</button><button type="button" data-speed="0.12">0.12×</button>
+          </div>
+        </div>
+        <div class="ctl-row">
+          <div class="seg" role="group" aria-label="View">
+            <button type="button" data-view="cut" aria-pressed="true">Cut open</button><button type="button" data-view="whole">Whole heart</button>
+          </div>
+          <button class="btn" type="button" data-labels aria-pressed="true">Labels</button>
+          <button class="btn" type="button" data-sound aria-pressed="false">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4Z" fill="currentColor" /><path d="M16.5 8.5a5 5 0 0 1 0 7M19 6a8.5 8.5 0 0 1 0 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" /></svg>
+            Sound
+          </button>
+        </div>
+
+        <label class="slider">
+          <span class="sl-top"><span>Heart rate</span><b><span data-out="hr">75</span> bpm</b></span>
+          <input type="range" min="40" max="180" step="1" value="75" data-param="hr" aria-label="Heart rate" />
+        </label>
+
+        <div class="readouts">
+          <div><small>LV pressure</small><b><span data-live="plv">–</span> <i>mmHg</i></b></div>
+          <div><small>Aortic pressure</small><b><span data-live="pao">–</span> <i>mmHg</i></b></div>
+          <div><small>Atrial pressure</small><b><span data-live="pla">–</span> <i>mmHg</i></b></div>
+          <div><small>LV volume</small><b><span data-live="vlv">–</span> <i>mL</i></b></div>
+        </div>
+
+        <div class="rail-wrap">
+          <div class="rail" data-rail="lab" aria-label="Phase timeline. Drag to scrub." role="slider" tabindex="0" aria-valuemin="0" aria-valuemax="100"></div>
+          <p class="rail-cap">Drag along the timeline to scrub through the beat.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2. SCROLLYTELLING -->
+  <section id="beat" class="cc-sec scrolly" data-scrolly>
+    <div class="container sc-head">
+      <p class="eyebrow">Scroll to move through time</p>
+      <h2>One beat, phase by phase</h2>
+      <p class="muted">The Wiggers diagram follows your scrolling: each card moves the cursor across its phase. Drag on the diagram to scrub freely.</p>
+    </div>
+    <div class="container sc-grid">
+      <div class="sc-fig" data-sc-fig>
+        <div class="rail small" data-rail="scrolly"></div>
+        <div class="legend" aria-hidden="true">
+          <span class="lg ao">Aortic</span><span class="lg lv">LV</span><span class="lg la">Atrial</span><span class="lg vol">LV volume</span><span class="lg ecg">ECG</span><span class="lg snd">Sounds</span>
+        </div>
+        <svg class="wiggers" data-wiggers role="img" aria-label="Wiggers diagram: aortic, left ventricular and left atrial pressure, left ventricular volume, ECG and heart sounds across one cardiac cycle"></svg>
+        <div class="sc-now">
+          <span class="sc-phase" data-sc="phase">Atrial systole</span>
+          <span class="sc-vals"><span>LV <b data-sc="plv">–</b></span><span>Ao <b data-sc="pao">–</b></span><span>LA <b data-sc="pla">–</b></span><span>Vol <b data-sc="vlv">–</b></span></span>
+        </div>
+        <p class="sc-key">MC mitral closes · AO aortic opens · AC aortic closes · MO mitral opens</p>
+      </div>
+
+      <div class="sc-steps">
+        <article class="step intro" data-step="-1">
+          <p class="eyebrow">0.8 seconds at 75 beats per minute</p>
+          <h3>Seven phases, two valves, one rule</h3>
+          <p>Blood only moves from high pressure to low pressure, and a valve only opens when pressure behind it is higher than pressure in front. Everything that follows comes from that rule.</p>
+          <p class="scroll-hint">Scroll down ↓</p>
+        </article>
+        {PHASES.map((ph, i) => (
+          <article class="step" id={ph.id} data-step={i}>
+            <p class="step-meta"><span class="step-n">{i + 1}</span><span>{ph.side}</span><span class="dur" data-dur={i}>{ms(dur[i])}</span></p>
+            <h3>{ph.name}</h3>
+            <p class="step-short">{ph.short}</p>
+            <p>{ph.body}</p>
+            <dl class="facts">
+              {ph.facts.map(([k, v]) => (<><dt>{k}</dt><dd>{v}</dd></>))}
+            </dl>
+            <p class="pearl"><b>Exam pearl.</b> {ph.pearl}</p>
+          </article>
+        ))}
+        <article class="step outro" data-step="7">
+          <h3>And the cycle repeats</h3>
+          <p>Systole (phases 2 to 4) lasts about <span data-sys>{ms(m.sysTime)}</span>; diastole the remaining <span data-dia>{ms(m.diaTime)}</span>. Change heart rate in the lab above or below and watch which part gives way.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3. PV LOOP LAB -->
+  <section id="pv" class="container cc-sec">
+    <p class="eyebrow">Simulator</p>
+    <h2>Pressure–volume loop lab</h2>
+    <p class="muted lab-lede">Each beat traces a loop: filling along the bottom, isovolumetric contraction up the right side, ejection across the top, relaxation down the left. Change one thing at a time and compare with the faint healthy loop.</p>
+
+    <div class="pv-grid">
+      <div class="pv-fig card">
+        <svg class="pvloop" data-pv role="img" aria-label="Pressure–volume loop of the left ventricle with end-systolic and end-diastolic pressure–volume relations"></svg>
+        <div class="metrics" data-metrics>
+          <div><small>Stroke volume</small><b data-m="sv">{Math.round(m.sv)}</b><i>mL</i><em data-d="sv"></em></div>
+          <div><small>Ejection fraction</small><b data-m="ef">{Math.round(m.ef * 100)}</b><i>%</i><em data-d="ef"></em></div>
+          <div><small>Cardiac output</small><b data-m="co">{m.co.toFixed(1)}</b><i>L/min</i><em data-d="co"></em></div>
+          <div><small>Blood pressure</small><b data-m="bp">{Math.round(m.sbp)}/{Math.round(m.dbp)}</b><i>mmHg</i><em data-d="bp"></em></div>
+          <div><small>EDV / ESV</small><b data-m="vols">{Math.round(m.edv)}/{Math.round(m.esv)}</b><i>mL</i><em data-d="vols"></em></div>
+          <div><small>LV filling pressure</small><b data-m="edp">{Math.round(m.edp)}</b><i>mmHg</i><em data-d="edp"></em></div>
+        </div>
+      </div>
+
+      <div class="pv-ctl">
+        <div class="scen">
+          <p class="ctl-h">Scenarios</p>
+          <div class="chips" role="group" aria-label="Scenarios">
+            {SCENARIOS.map((s, i) => <button type="button" class="chip" data-scenario={s.id} aria-pressed={i === 0 ? 'true' : 'false'}>{s.name}</button>)}
+          </div>
+          <p class="scen-note" data-scen-note aria-live="polite">{SCENARIOS[0].note}</p>
+        </div>
+
+        <p class="ctl-h">Adjust</p>
+        {sliders.map((s) => (
+          <label class="slider">
+            <span class="sl-top"><span>{s.name}</span><b><span data-out={s.p}>{s.p === 'hr' ? 75 : '1.00'}</span>{s.p === 'hr' ? ' bpm' : '×'}</b></span>
+            <input type="range" min={s.min} max={s.max} step={s.step} value={s.p === 'hr' ? 75 : 1} data-param={s.p} aria-label={s.name} />
+            <span class="sl-hint">{s.hint}</span>
+          </label>
+        ))}
+        <div class="lesion">
+          <p class="ctl-h">Valve lesion</p>
+          <div class="chips" role="group" aria-label="Valve lesion">
+            {lesions.map(([k, n], i) => <button type="button" class="chip" data-lesion={k} aria-pressed={i === 0 ? 'true' : 'false'}>{n}</button>)}
+          </div>
+          <label class="slider" data-sev-wrap hidden>
+            <span class="sl-top"><span>Severity</span><b><span data-sev-out>50</span>%</b></span>
+            <input type="range" min="0.1" max="0.95" step="0.05" value="0.5" data-sev aria-label="Lesion severity" />
+          </label>
+        </div>
+        <button type="button" class="btn" data-reset>Reset to healthy</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4. SUMMARY -->
+  <section id="summary" class="container cc-sec">
+    <p class="eyebrow">Revision</p>
+    <h2>Summary</h2>
+    <div class="table-wrap card">
+      <table class="sum">
+        <thead><tr><th>#</th><th>Phase</th><th>Duration</th><th>Mitral</th><th>Aortic</th><th>ECG</th><th>Sound</th></tr></thead>
+        <tbody>
+          {PHASES.map((ph, i) => {
+            const f = Object.fromEntries(ph.facts);
+            const open = (v) => v.includes('Mitral open') ? ['Open', 'Closed'] : v.includes('Aortic open') ? ['Closed', 'Open'] : ['Closed', 'Closed'];
+            const [mv, av] = open(f.Valves);
+            return (
+              <tr>
+                <td>{i + 1}</td><td><a href={`#${ph.id}`}>{ph.name}</a></td><td class="num" data-dur-row={i}>{ms(dur[i])}</td>
+                <td class={mv === 'Open' ? 'op' : 'cl'}>{mv}</td><td class={av === 'Open' ? 'op' : 'cl'}>{av}</td><td>{f.ECG}</td><td>{f.Sound}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+    <p class="cap">Durations come from the model at the current heart rate (<span data-out="hr">75</span> bpm) and update when you change it.</p>
+
+    <div class="keys">
+      <div class="card key"><small>Stroke volume</small><b>SV = EDV − ESV</b><span>about 70 mL</span></div>
+      <div class="card key"><small>Ejection fraction</small><b>EF = SV ÷ EDV</b><span>normally 55 to 70%</span></div>
+      <div class="card key"><small>Cardiac output</small><b>CO = SV × HR</b><span>about 5 L/min at rest</span></div>
+      <div class="card key"><small>Systole vs diastole</small><b>≈ 1 : 2 at 75 bpm</b><span>diastole shortens most as rate rises</span></div>
+    </div>
+
+    <details class="sources">
+      <summary>Sources and how the model works</summary>
+      <p>Phase descriptions follow standard physiology texts: Guyton and Hall Textbook of Medical Physiology, Ganong’s Review of Medical Physiology, and A.K. Jain’s Textbook of Physiology.</p>
+      <p>The simulation is a lumped-parameter model: the left atrium and ventricle are time-varying elastances (ventricular activation uses the double-hill function of Stergiopulos and colleagues, 1996), valves are one-way with inertia, and the arteries are a four-element windkessel. Values are typical for a healthy adult and are meant for understanding, not for clinical prediction.</p>
+    </details>
+  </section>
+</div>
+
+<script>
+  import { initCardiac } from './main.js';
+  initCardiac();
+</script>

@@ -1,0 +1,53 @@
+---
+import Base from '../../layouts/Base.astro';
+import { subjects, topicUrl } from '../../lib/catalog.js';
+
+export function getStaticPaths() {
+  return subjects.map((s) => ({ params: { subject: s.slug }, props: { s } }));
+}
+const { s } = Astro.props;
+const base = import.meta.env.BASE_URL;
+---
+<Base title={s.name} description={`${s.name}: ${s.blurb} Interactive explainers on MedVisual.`}>
+  <div class="container" data-pagefind-body>
+    <nav class="crumbs" aria-label="Breadcrumb" data-pagefind-ignore><a href={base}>All subjects</a><span>/</span><span>{s.name}</span></nav>
+    <header class="s-head">
+      <h1 data-pagefind-meta="title">{s.name}</h1>
+      <p class="lede">{s.blurb}</p>
+      <p class="eyebrow">{s.count ? `${s.count} ${s.count === 1 ? 'topic' : 'topics'}` : 'No topics yet'}</p>
+    </header>
+    {s.chapters.length === 0 && (
+      <div class="none">Topics for {s.name} will appear here as they are added.</div>
+    )}
+    {s.chapters.map((c) => (
+      <section class="chapter" id={c.slug}>
+        <h2>{c.name}</h2>
+        <div class="rows">
+          {c.topics.map((t) => (
+            <a class="row card" href={base + topicUrl(t)}>
+              <span class="row-art" aria-hidden="true" set:html={t.art || ''} />
+              <span class="row-body"><b>{t.title}</b><small>{t.blurb}</small></span>
+              <span class="arrow" aria-hidden="true">→</span>
+            </a>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+</Base>
+
+<style>
+  .s-head { display: flex; flex-direction: column; gap: 10px; padding: 18px 0 30px; }
+  .none { padding: 22px 18px; border: 1px dashed var(--line-strong); border-radius: var(--radius); color: var(--muted); }
+  .chapter { margin-bottom: 34px; }
+  .chapter h2 { font: 500 13px var(--font-mono); text-transform: uppercase; letter-spacing: .08em; color: var(--muted); margin-bottom: 12px; }
+  .rows { display: flex; flex-direction: column; gap: 10px; }
+  .row { display: grid; grid-template-columns: 64px minmax(0, 1fr) auto; align-items: center; gap: 16px; padding: 12px 16px 12px 12px; text-decoration: none; transition: border-color .15s; }
+  .row:hover { border-color: var(--accent); }
+  .row-art { width: 64px; aspect-ratio: 1; border-radius: 10px; background: radial-gradient(circle at 35% 30%, var(--stage-1), var(--stage-2)); display: grid; place-items: center; }
+  .row-art :global(svg) { width: 80%; height: 80%; }
+  .row-body { display: flex; flex-direction: column; min-width: 0; }
+  .row-body b { font: 600 18px var(--font-display); }
+  .row-body small { color: var(--muted); font-size: 14px; }
+  .arrow { color: var(--accent); font: 500 20px var(--font-mono); }
+</style>

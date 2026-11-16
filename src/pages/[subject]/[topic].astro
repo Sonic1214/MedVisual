@@ -1,0 +1,30 @@
+---
+import Base from '../../layouts/Base.astro';
+import { topics, subjectBySlug } from '../../lib/catalog.js';
+
+export function getStaticPaths() {
+  return topics.map((t) => ({ params: { subject: t.subject, topic: t.slug }, props: { t } }));
+}
+const pages = import.meta.glob('../../topics/*/*/Page.astro', { eager: true });
+const { t } = Astro.props;
+const Page = pages[`../../topics/${t.key}/Page.astro`].default;
+const s = subjectBySlug[t.subject];
+const base = import.meta.env.BASE_URL;
+---
+<Base title={t.title} description={t.description || t.blurb}>
+  <article data-pagefind-body>
+    <div class="container topic-head">
+      <nav class="crumbs" aria-label="Breadcrumb" data-pagefind-ignore>
+        <a href={base}>All subjects</a><span>/</span><a href={`${base}${s.slug}/`}>{s.name}</a><span>/</span><a href={`${base}${s.slug}/#${t.chapterSlug}`}>{t.chapter}</a>
+      </nav>
+      <h1 data-pagefind-meta="title">{t.title}</h1>
+      <p class="lede">{t.blurb}</p>
+    </div>
+    <Page topic={t} />
+  </article>
+</Base>
+
+<style>
+  .topic-head { display: flex; flex-direction: column; gap: 10px; padding-bottom: 8px; }
+  .topic-head h1 { margin-top: 8px; }
+</style>

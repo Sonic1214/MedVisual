@@ -1,0 +1,16 @@
+---
+import Base from '../layouts/Base.astro';
+const base = import.meta.env.BASE_URL;
+---
+<Base title="Page not found">
+  <div class="container nf">
+    <p class="eyebrow">404</p>
+    <h1>That page has flatlined.</h1>
+    <p class="lede">It may have moved. Search for it, or go back to all subjects.</p>
+    <div class="acts"><button class="btn accent" type="button" data-search-open>Search</button><a class="btn" href={base}>All subjects</a></div>
+  </div>
+</Base>
+<style>
+  .nf { padding-top: 80px; display: flex; flex-direction: column; gap: 14px; }
+  .acts { display: flex; gap: 10px; margin-top: 8px; }
+</style>

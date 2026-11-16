@@ -1,0 +1,59 @@
+/* Styles for the brachial plexus explorer, scoped to .bp-root */
+.bp-root .bp{display:grid;gap:16px;grid-template-columns:minmax(0,1fr)}
+@media (min-width:860px){.bp-root .bp{grid-template-columns:minmax(0,420px) minmax(0,1fr);column-gap:32px;align-items:start}.bp-root .bp-pick{grid-column:1 / -1}}
+.bp-root .bp-pick{display:flex;flex-direction:column;gap:10px}
+.bp-root .chips{display:flex;flex-wrap:wrap;gap:6px}
+.bp-root .chip{min-height:40px;padding:0 12px;border:1px solid var(--line-strong);background:var(--surface);color:var(--fg);border-radius:8px;font:500 14px var(--font-body);cursor:pointer}
+.bp-root .chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.bp-root .seg{display:flex;gap:0;align-self:flex-start}
+.bp-root .seg button{min-height:40px;padding:0 18px;border:1px solid var(--line-strong);background:var(--surface);color:var(--fg);font:500 14px var(--font-body);cursor:pointer}
+.bp-root .seg button:first-child{border-radius:8px 0 0 8px}
+.bp-root .seg button:last-child{border-radius:0 8px 8px 0;border-left:0}
+.bp-root .seg button[aria-pressed="true"]{background:var(--fg);border-color:var(--fg);color:var(--bg)}
+.bp-root .seg button:disabled{opacity:.4;cursor:not-allowed}
+.bp-root .bp-fig{min-width:0}
+.bp-root .bp-fig svg{display:block;width:100%;max-width:420px;margin:0 auto}
+.bp-root .bp .e{stroke:var(--line-strong);stroke-width:1.25}
+.bp-root .bp .e.on{stroke:var(--accent);stroke-width:2.5}
+.bp-root .bp .n rect{fill:var(--surface);stroke:var(--line-strong);stroke-width:.75}
+.bp-root .bp .n text{fill:var(--fg);font-size:12px;text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.bp-root .bp .n.on rect{fill:var(--accent-soft);stroke:var(--accent);stroke-width:1.25}
+.bp-root .bp .n.sel{cursor:pointer}
+.bp-root .bp .n.sel rect{stroke-width:1.5}
+.bp-root .bp .n.sel text{font-weight:500}
+.bp-root .bp .n.sel:hover rect{stroke:var(--accent)}
+.bp-root .bone{fill:var(--surface);stroke:var(--line-strong);stroke-width:.75}
+.bp-root .nv{fill:none;stroke:var(--accent);stroke-width:4;stroke-linecap:round;stroke-linejoin:round}
+.bp-root .nv.thin{stroke-width:2.5}
+.bp-root .nv.back{stroke-dasharray:4 5;opacity:.8}
+.bp-root .lm{cursor:pointer}
+.bp-root .lm circle:not(.hit){fill:var(--surface);stroke:var(--accent);stroke-width:2}
+.bp-root .lm .hit{fill:transparent;stroke:none}
+.bp-root .lm text{fill:var(--accent);font:500 12px var(--font-mono);text-anchor:middle;dominant-baseline:central;pointer-events:none}
+.bp-root .lm.on circle:not(.hit){fill:var(--accent);stroke:var(--accent)}
+.bp-root .lm.on text{fill:var(--on-accent)}
+.bp-root .bp-info{min-width:0;display:flex;flex-direction:column;gap:12px}
+.bp-root .bp .nm{font-size:22px}
+.bp-root .bp .site{padding:12px 14px;background:var(--accent-soft);border-radius:8px;display:flex;flex-direction:column;gap:8px}
+.bp-root .bp .site h4{font:500 16px var(--font-display);margin:0}
+.bp-root .bp .site p{font-size:15px}
+.bp-root .bp .inj{color:var(--fg)}
+.bp-root .step{display:flex;gap:8px}
+.bp-root .facts{display:grid;grid-template-columns:minmax(0,92px) minmax(0,1fr);gap:6px 12px;margin:0;font-size:14px}
+.bp-root .facts dt{font:11px var(--font-mono);text-transform:uppercase;letter-spacing:.05em;color:var(--muted);padding-top:3px}
+.bp-root .facts dd{margin:0}
+.bp-root .bp .sub{font:500 13px var(--font-mono);text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin:6px 0 0}
+.bp-root .dis{background:var(--surface);border:1px solid var(--line);border-radius:8px}
+.bp-root .dis summary{cursor:pointer;padding:12px 14px;font:500 15px var(--font-display);list-style:none;display:flex;justify-content:space-between;gap:10px}
+.bp-root .dis summary::after{content:"+";color:var(--accent);font-family:var(--font-mono)}
+.bp-root .dis[open] summary::after{content:"\2212"}
+.bp-root .dis summary::-webkit-details-marker{display:none}
+.bp-root .dis>div{padding:0 14px 12px;display:flex;flex-direction:column;gap:6px;font-size:14px;color:var(--muted)}
+.bp-root .dis>div b{color:var(--fg);font-weight:500}
+.bp-root .hint{font-size:13px;color:var(--muted)}
+.bp-root .cap{font:12px var(--font-mono);color:var(--muted);margin-top:6px}
+.bp-root .ts{fill:var(--muted);font-size:12px}
+.bp-root svg text{font-family:var(--font-body)}
+.bp-root .btn{min-height:36px}
+.bp-root .chip{border-radius:999px}
+.bp-root .seg button:first-child{border-radius:999px 0 0 999px}.bp-root .seg button:last-child{border-radius:0 999px 999px 0}

@@ -1,0 +1,17 @@
+---
+import './plexus.css';
+---
+<section class="container bp-wrap">
+  <div class="bp-root" id="bp-root"></div>
+  <noscript>This explorer needs JavaScript.</noscript>
+</section>
+
+<style>
+  .bp-wrap { padding-top: 16px; }
+</style>
+
+<script>
+  import { brachialPlexus } from './plexus.js';
+  const root = document.getElementById('bp-root');
+  if (root) brachialPlexus(root);
+</script>

@@ -1,0 +1,91 @@
+---
+import Base from '../layouts/Base.astro';
+import { subjects, topics, subjectBySlug, topicUrl } from '../lib/catalog.js';
+const base = import.meta.env.BASE_URL;
+const featured = topics.filter((t) => t.featured !== false).slice(0, 6);
+const live = topics.length;
+---
+<Base>
+  <section class="hero container">
+    <p class="eyebrow">{subjects.length} subjects · {live} interactive {live === 1 ? 'topic' : 'topics'}</p>
+    <h1>Medicine you can <span class="hl">touch, turn and test.</span></h1>
+    <p class="lede">3D models you can rotate, simulations you can push into disease, and diagrams that move as you scroll. One page per topic, organised by subject.</p>
+    <button class="hero-search" type="button" data-search-open>
+      <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.6-3.6" /></svg>
+      <span>Search anything: “cardiac cycle”, “radial nerve”, “S3”…</span>
+    </button>
+    <svg class="ecg-line" viewBox="0 0 1200 80" preserveAspectRatio="none" aria-hidden="true">
+      <path pathLength="1" d="M0 50 H140 q14 -14 28 0 h18 l6 8 l12 -46 l12 54 l6 -16 h22 q28 -22 56 0 H520 q14 -14 28 0 h18 l6 8 l12 -46 l12 54 l6 -16 h22 q28 -22 56 0 H900 q14 -14 28 0 h18 l6 8 l12 -46 l12 54 l6 -16 h22 q28 -22 56 0 H1200" />
+    </svg>
+  </section>
+
+  <section class="container block" aria-labelledby="feat-h">
+    <div class="block-head"><h2 id="feat-h">Start exploring</h2></div>
+    <div class="feat-grid">
+      {featured.map((t) => (
+        <a class="feat card" href={base + topicUrl(t)} style={t.hue ? `--hue:${t.hue}` : ''}>
+          <span class="feat-art" aria-hidden="true" set:html={t.art || ''} />
+          <span class="feat-body">
+            <span class="eyebrow">{subjectBySlug[t.subject]?.name} · {t.chapter}</span>
+            <b>{t.title}</b>
+            <small>{t.blurb}</small>
+            {t.tags && <span class="tags">{t.tags.map((g) => <span>{g}</span>)}</span>}
+          </span>
+        </a>
+      ))}
+    </div>
+  </section>
+
+  <section class="container block" aria-labelledby="subj-h">
+    <div class="block-head"><h2 id="subj-h">All subjects</h2></div>
+    <div class="subj-grid">
+      {subjects.map((s, i) => (
+        <a class={`subj card ${s.count ? 'live' : 'empty'}`} href={`${base}${s.slug}/`}>
+          <span class="num">{String(i + 1).padStart(2, '0')}</span>
+          <b>{s.name}</b>
+          <small>{s.blurb}</small>
+          <span class="meta">{s.count ? `${s.count} ${s.count === 1 ? 'topic' : 'topics'}` : 'Coming soon'}</span>
+        </a>
+      ))}
+    </div>
+  </section>
+</Base>
+
+<style>
+  .hero { padding-top: clamp(36px, 8vw, 88px); display: flex; flex-direction: column; gap: 18px; }
+  .hero h1 { max-width: 16ch; }
+  .hl { color: var(--accent); }
+  .hero-search {
+    display: flex; align-items: center; gap: 12px; width: 100%; max-width: 560px; height: 56px; padding: 0 20px; margin-top: 6px;
+    border: 1px solid var(--line-strong); border-radius: 999px; background: var(--surface); color: var(--muted); box-shadow: var(--shadow); cursor: pointer; text-align: left;
+  }
+  .hero-search:hover { border-color: var(--fg); }
+  .hero-search span { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .hero-search svg { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; flex: none; }
+  .ecg-line { width: 100%; height: 60px; margin-top: 18px; }
+  .ecg-line path { fill: none; stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; stroke-dasharray: 1; stroke-dashoffset: 1; animation: draw 3.2s ease-out forwards; }
+  @keyframes draw { to { stroke-dashoffset: 0; } }
+
+  .block { margin-top: 48px; }
+  .block-head { margin-bottom: 16px; }
+  .feat-grid { display: grid; gap: 14px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+  .feat { display: grid; grid-template-columns: 112px minmax(0, 1fr); gap: 16px; padding: 14px; text-decoration: none; transition: border-color .15s, transform .15s; }
+  .feat:hover { border-color: var(--accent); transform: translateY(-2px); }
+  .feat-art { width: 112px; aspect-ratio: 1; border-radius: 10px; background: radial-gradient(circle at 35% 30%, var(--stage-1), var(--stage-2)); display: grid; place-items: center; overflow: hidden; }
+  .feat-art :global(svg) { width: 84%; height: 84%; }
+  .feat-body { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .feat-body b { font: 600 20px/1.2 var(--font-display); }
+  .feat-body small { color: var(--muted); font-size: 14px; line-height: 1.45; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+  .tags span { font: 500 11px var(--font-mono); padding: 2px 8px; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+
+  .subj-grid { display: grid; gap: 10px; grid-template-columns: repeat(auto-fill, minmax(min(100%, 150px), 1fr)); }
+  .subj { display: flex; flex-direction: column; gap: 4px; min-height: 128px; padding: 12px 14px; text-decoration: none; transition: border-color .15s; }
+  .subj:hover { border-color: var(--accent); }
+  .subj .num { font: 12px var(--font-mono); color: var(--muted); }
+  .subj b { font: 600 18px/1.2 var(--font-display); }
+  .subj small { color: var(--muted); font-size: 13px; line-height: 1.4; }
+  .subj .meta { margin-top: auto; padding-top: 8px; font: 12px var(--font-mono); color: var(--muted); }
+  .subj.live .meta { color: var(--accent); }
+  .subj.empty { background: transparent; border-style: dashed; }
+</style>

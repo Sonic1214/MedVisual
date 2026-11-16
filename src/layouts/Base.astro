@@ -1,0 +1,50 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import { searchIndex } from '../lib/catalog.js';
+
+interface Props { title?: string; description?: string }
+const { title, description = 'Interactive visual explainers for medical students: 3D models, simulations and step-by-step diagrams, organised by subject.' } = Astro.props;
+const base = import.meta.env.BASE_URL;
+const fullTitle = title ? `${title} · MedVisual` : 'MedVisual · Interactive medicine explainers';
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <link rel="icon" href={`${base}favicon.svg`} type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" />
+    <script is:inline>
+      (function () { try { var t = localStorage.getItem('mv-theme'); if (t === 'light' || t === 'dark') document.documentElement.dataset.theme = t; } catch (e) {} })();
+    </script>
+    <slot name="head" />
+  </head>
+  <body>
+    <a class="skip" href="#main">Skip to content</a>
+    <Header />
+    <main id="main" class="main"><slot /></main>
+    <footer class="site-foot">
+      <div class="container foot-row">
+        <a class="foot-brand" href={base}>MedVisual</a>
+        <span>Interactive explainers for medical students.</span>
+        <button class="foot-search" type="button" data-search-open>Search the site</button>
+      </div>
+    </footer>
+    <script is:inline type="application/json" id="mv-index" set:html={JSON.stringify(searchIndex)} />
+  </body>
+</html>
+
+<style is:global>
+  .site-foot { border-top: 1px solid var(--line); padding: 28px 0 calc(28px + env(safe-area-inset-bottom, 0px)); color: var(--muted); font-size: 14px; }
+  .foot-row { display: flex; flex-wrap: wrap; gap: 8px 20px; align-items: center; }
+  .foot-brand { font: 700 15px var(--font-display); text-decoration: none; color: var(--fg); }
+  .foot-search { margin-left: auto; background: none; border: 0; padding: 0; color: var(--muted); text-decoration: underline; cursor: pointer; }
+</style>

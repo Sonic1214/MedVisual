@@ -1,0 +1,116 @@
+// Text content for the cardiac cycle page. Edit wording here; the page and
+// the search index pick it up automatically.
+
+export const PHASES = [
+  {
+    id: 'atrial-systole',
+    name: 'Atrial systole',
+    short: 'Atria top up the ventricle',
+    side: 'Diastole',
+    body: 'The P wave spreads through the atria and they contract. With the mitral valve already open, they push in the last blood before the ventricle contracts. This “atrial kick” adds roughly 10 to 20% of end-diastolic volume at rest.',
+    facts: [
+      ['Valves', 'Mitral open · Aortic closed'],
+      ['ECG', 'P wave, then PR segment'],
+      ['Atrial pressure', '“a” wave'],
+      ['Sound', 'S4 only if the ventricle is stiff'],
+    ],
+    pearl: 'Atrial fibrillation removes the atrial kick (and the “a” wave and S4). Patients with stiff or hypertrophied ventricles, or mitral stenosis, lose the most output.',
+  },
+  {
+    id: 'isovolumetric-contraction',
+    name: 'Isovolumetric contraction',
+    short: 'All valves shut, pressure soars',
+    side: 'Systole',
+    body: 'The QRS complex triggers ventricular contraction. As soon as LV pressure rises above atrial pressure, the mitral valve snaps shut: the first heart sound. The aortic valve is still closed, so the ventricle squeezes a fixed volume and pressure climbs steeply until it passes aortic diastolic pressure (about 80 mmHg).',
+    facts: [
+      ['Valves', 'Both closed'],
+      ['ECG', 'QRS complex'],
+      ['Atrial pressure', '“c” wave as the mitral leaflets bulge back'],
+      ['Sound', 'S1 (mitral and tricuspid closure)'],
+    ],
+    pearl: 'The steepest rise of LV pressure (peak dP/dt) happens here, which is why it is used as an index of contractility.',
+  },
+  {
+    id: 'rapid-ejection',
+    name: 'Rapid ejection',
+    short: 'Aortic valve opens, blood rushes out',
+    side: 'Systole',
+    body: 'LV pressure exceeds aortic pressure, the aortic valve opens and blood leaves fast. About 70% of the stroke volume is ejected in roughly the first third of ejection. LV and aortic pressures rise together to their peak, about 120 mmHg.',
+    facts: [
+      ['Valves', 'Mitral closed · Aortic open'],
+      ['ECG', 'ST segment'],
+      ['Atrial pressure', '“x” descent as the atria relax and the valve ring is pulled down'],
+      ['Sound', 'None (an ejection click if the valve is diseased)'],
+    ],
+    pearl: 'In aortic stenosis a pressure gradient opens up across the valve here: LV pressure rises well above aortic pressure.',
+  },
+  {
+    id: 'reduced-ejection',
+    name: 'Reduced ejection',
+    short: 'Outflow slows, momentum carries it on',
+    side: 'Systole',
+    body: 'The ventricles start to repolarise (T wave) and contraction weakens. Outflow slows, and LV pressure dips slightly below aortic pressure, yet blood keeps moving forward on its momentum. Meanwhile the atria fill from the pulmonary veins behind the closed mitral valve.',
+    facts: [
+      ['Valves', 'Mitral closed · Aortic open'],
+      ['ECG', 'T wave'],
+      ['Atrial pressure', 'Rising toward the “v” wave'],
+      ['Sound', 'None'],
+    ],
+    pearl: 'Many Indian textbooks name the last ~0.04 s of this period, from the start of relaxation to aortic valve closure, “protodiastole”.',
+  },
+  {
+    id: 'isovolumetric-relaxation',
+    name: 'Isovolumetric relaxation',
+    short: 'Both valves shut, pressure falls',
+    side: 'Diastole',
+    body: 'Aortic pressure now exceeds LV pressure, so the aortic valve closes: the second heart sound and the dicrotic notch on the aortic trace. With both valves shut, the ventricle relaxes at its smallest volume (end-systolic volume) and its pressure falls fast.',
+    facts: [
+      ['Valves', 'Both closed'],
+      ['ECG', 'End of T wave'],
+      ['Atrial pressure', 'Peak of the “v” wave'],
+      ['Sound', 'S2 (aortic then pulmonary closure)'],
+    ],
+    pearl: 'A2 comes before P2. On inspiration the gap widens (physiological splitting of S2) because more blood returns to the right heart.',
+  },
+  {
+    id: 'rapid-filling',
+    name: 'Rapid filling',
+    short: 'Mitral valve opens, blood pours in',
+    side: 'Diastole',
+    body: 'When LV pressure falls below atrial pressure the mitral valve opens. Blood that collected in the atrium during systole rushes into the relaxing ventricle. Most ventricular filling happens in this first third of diastole.',
+    facts: [
+      ['Valves', 'Mitral open · Aortic closed'],
+      ['ECG', 'TP segment (electrically quiet)'],
+      ['Atrial pressure', '“y” descent'],
+      ['Sound', 'S3 (normal in children, athletes and pregnancy)'],
+    ],
+    pearl: 'An S3 after about 40 years of age suggests a volume-loaded or failing ventricle (heart failure, mitral regurgitation).',
+  },
+  {
+    id: 'diastasis',
+    name: 'Diastasis',
+    short: 'Slow filling while pressures equalise',
+    side: 'Diastole',
+    body: 'Atrial and ventricular pressures are now almost equal and blood trickles from the pulmonary veins straight through to the ventricle. This is the longest phase at rest and the first to shrink as heart rate rises, which is why very fast rates cut filling.',
+    facts: [
+      ['Valves', 'Mitral open · Aortic closed'],
+      ['ECG', 'TP segment, ending with the next P wave'],
+      ['Atrial pressure', 'Low and flat'],
+      ['Sound', 'None'],
+    ],
+    pearl: 'Try 150 beats per minute in the lab above: diastasis almost disappears, while systole hardly changes.',
+  },
+];
+
+export const SCENARIOS = [
+  { id: 'rest', name: 'Healthy, at rest', p: {}, note: 'The reference loop. About 130 mL fills the ventricle and about 55% of it is ejected each beat.' },
+  { id: 'exercise', name: 'Exercise', p: { hr: 140, contractility: 1.8, afterload: 0.55, preload: 1.8 }, note: 'Sympathetic drive raises rate and contractility while muscle vessels dilate. The loop widens to the left (smaller end-systolic volume) and cardiac output more than doubles. Diastasis almost vanishes.' },
+  { id: 'haemorrhage', name: 'Blood loss', p: { preload: 0.6, hr: 115, afterload: 1.25, contractility: 1.15 }, note: 'Less venous return means less filling. The loop shrinks from the right (lower end-diastolic volume) and stroke volume falls, despite a faster, stronger heart (Frank–Starling in reverse).' },
+  { id: 'hypertension', name: 'High afterload', p: { afterload: 1.6 }, note: 'The ventricle must generate more pressure to open the aortic valve. The loop gets taller and narrower: end-systolic volume rises and stroke volume falls.' },
+  { id: 'hfref', name: 'Systolic heart failure', p: { contractility: 0.45, preload: 1.5, hr: 95, afterload: 1.15 }, note: 'Weak contraction (flatter end-systolic line). The loop shifts right: high filling volume and pressure, low ejection fraction. An S3 appears.' },
+  { id: 'hfpef', name: 'Stiff ventricle', p: { compliance: 1.5, preload: 1.6 }, note: 'A stiff, hypertrophied ventricle (steeper filling curve). Filling pressures are high even at normal volume, and filling leans on the atrial kick, producing an S4.' },
+  { id: 'as', name: 'Aortic stenosis', p: { as: 0.85 }, note: 'A narrow aortic valve: LV pressure rises far above aortic pressure during ejection (watch the gap on the pressure plot). Ejection systolic murmur.' },
+  { id: 'ar', name: 'Aortic regurgitation', p: { ar: 0.45 }, note: 'Blood leaks back from the aorta in diastole: there is no true isovolumetric phase, aortic diastolic pressure is low, the pulse pressure is wide and the ventricle dilates. Early diastolic murmur.' },
+  { id: 'ms', name: 'Mitral stenosis', p: { ms: 0.75, preload: 1.8 }, note: 'Filling is slowed through a narrow mitral valve: a pressure gap persists between atrium and ventricle all through diastole, and filling continues until the next beat. Mid-diastolic rumble.' },
+  { id: 'mr', name: 'Mitral regurgitation', p: { mr: 0.45, preload: 1.3 }, note: 'Part of each beat leaks back into the atrium, so there is no true isovolumetric contraction. Total stroke volume is high but forward output falls, and atrial “v” waves grow. Pansystolic murmur.' },
+];
